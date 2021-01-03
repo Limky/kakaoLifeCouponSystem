@@ -2,10 +2,10 @@
 쿠폰API 시스템
 
 # 개발 프레임 워크
-1.Spring boot 2.4.1
-2.java 1.8
-3.Oracle 12
-4. etc : lombok, mybatis, log4j, log4jdbc 등..
+  1.Spring boot 2.4.1
+  2.java 1.8
+  3.Oracle 12
+  4.lombok, mybatis, log4j, log4jdbc 등..
 
 # 문제해결 전략
 
