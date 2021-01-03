@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.CouponDao">
+		
+	<select id="issueCoupon" resultType="com.example.demo.model.CouponVO">
+
+		SELECT
+			COUPON_ID,
+			CUST_ID,
+			ISSUE_YN,
+			USE_YMD,
+			CREATE_YMD,
+			END_YMD,
+			REG_ENO,
+			REG_DATE,
+			TRT_ENO,
+			TRT_DATE
+		  FROM TB_CSCPINFO
+		  WHERE ISSUE_YN = 'N'
+	      AND REG_DATE = (
+	        SELECT MIN(REG_DATE)
+	         FROM TB_CSCPINFO
+	      )
+    	  AND ROWNUM = 1
+	</select>
+
+
+  <insert id="insertCoupon" parameterType="java.util.List">
+   INSERT ALL  
+    <foreach collection="list" item="item" index="index" >
+     INTO TB_CSCPINFO (
+         COUPON_ID,
+		 ISSUE_YN,
+		 CREATE_YMD,
+		 END_YMD,
+		 REG_ENO,
+		 REG_DATE,
+		 TRT_ENO,
+		 TRT_DATE
+		 ) 
+		 VALUES
+		  ( 
+		  #{item.COUPON_ID}
+		 ,#{item.ISSUE_YN}
+		 ,#{item.CREATE_YMD}
+		 ,#{item.END_YMD}
+		 ,#{item.REG_ENO}
+		 ,CURRENT_TIMESTAMP
+		 ,#{item.TRT_ENO}
+		 ,CURRENT_TIMESTAMP	  
+		  )
+    </foreach>
+   SELECT * FROM dual
+ </insert>
+ 
+   <update id="updateCouponIssueYn" parameterType="com.example.demo.model.CouponVO">
+        UPDATE TB_CSCPINFO
+	        SET 
+	        	CUST_ID = #{CUST_ID},
+	        	ISSUE_YN = #{ISSUE_YN},
+	        	TRT_ENO = #{TRT_ENO},
+	        	TRT_DATE = CURRENT_TIMESTAMP
+        WHERE COUPON_ID = #{COUPON_ID}
+    </update>
+ 
+ 	<select id="getIssuedCoupon" resultType="com.example.demo.model.CouponVO">
+
+		SELECT
+			COUPON_ID,
+			CUST_ID,
+			ISSUE_YN,
+			USE_YMD,
+			CREATE_YMD,
+			END_YMD,
+			REG_ENO,
+			REG_DATE,
+			TRT_ENO,
+			TRT_DATE
+		  FROM TB_CSCPINFO
+		  WHERE ISSUE_YN = #{ISSUE_YN}
+	      
+	</select>
+ 
+  	<select id="getCoupon" resultType="com.example.demo.model.CouponVO">
+
+		SELECT
+			COUPON_ID,
+			CUST_ID,
+			ISSUE_YN,
+			USE_YMD,
+			CREATE_YMD,
+			END_YMD,
+			REG_ENO,
+			REG_DATE,
+			TRT_ENO,
+			TRT_DATE
+		  FROM TB_CSCPINFO
+		  WHERE COUPON_ID = #{COUPON_ID}
+	</select>
+	
+	 <update id="updateCouponUse" parameterType="com.example.demo.model.CouponVO">
+        UPDATE TB_CSCPINFO
+	        SET 
+	        	CUST_ID = #{CUST_ID},
+	        	USE_YMD = #{USE_YMD},
+	        	TRT_ENO = #{TRT_ENO},
+	        	TRT_DATE = CURRENT_TIMESTAMP
+        WHERE COUPON_ID = #{COUPON_ID}
+    </update>
+    
+     <update id="updateCouponCancel" parameterType="com.example.demo.model.CouponVO">
+        UPDATE TB_CSCPINFO
+	        SET 
+	        	CUST_ID = #{CUST_ID},
+	        	ISSUE_YN = #{ISSUE_YN},
+	        	CREATE_YMD = #{CREATE_YMD},
+	        	END_YMD = #{END_YMD},
+	        	TRT_ENO = #{TRT_ENO},
+	        	TRT_DATE = CURRENT_TIMESTAMP
+        WHERE COUPON_ID = #{COUPON_ID}
+    </update>
+ 
+ 
+  	<select id="getExpiredCoupon" parameterType="com.example.demo.model.CouponVO" resultType="com.example.demo.model.CouponVO">
+
+		SELECT
+			COUPON_ID,
+			CUST_ID,
+			ISSUE_YN,
+			USE_YMD,
+			CREATE_YMD,
+			END_YMD,
+			REG_ENO,
+			REG_DATE,
+			TRT_ENO,
+			TRT_DATE
+		  FROM TB_CSCPINFO
+		  WHERE END_YMD = #{END_YMD}
+	      
+	</select>
+	
+	  	<select id="getCustInfoBefore3day" parameterType="com.example.demo.model.CouponVO" resultType="com.example.demo.model.CustVO">
+
+		SELECT
+			B.CUST_ID,
+			B.PHONE_NUMBER
+		  FROM TB_CSCPINFO A, TB_CSINFO B
+		  WHERE A.CUST_ID = B.CUST_ID --조인
+		    AND A.ISSUE_YN = 'Y' --고객에게 배정은 받았음
+		    AND A.USE_YMD IS NULL --아직 사용하지 않았음
+		    AND A.END_YMD = #{END_YMD}
+	      
+	</select>
+
+ </mapper>
